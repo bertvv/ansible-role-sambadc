@@ -1,0 +1,18 @@
+# sambadc/tasks/firewall.yml
+---
+
+- name: Ensure firewall is enabled
+  service:
+    name: firewalld
+    state: started
+  tags: sambadc
+
+- name: Apply firewall rules
+  firewalld:
+    port: "{{ item }}"
+    state: enabled
+    zone: public
+    permanent: true
+  with_items: sambadc_firewall_ports
+  notify: restart firewall
+  tags: sambadc

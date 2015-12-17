@@ -1,0 +1,35 @@
+[Global]
+  workgroup = {{ sambadc_workgroup }}
+  security = user
+  domain master = yes
+  domain logons = yes
+  local master = yes
+  wins support = yes
+  preferred master = yes
+  passdb backend = tdbsam
+  logon path = \\%L\Profiles\%U
+  logon script = logon.bat
+  add machine script = /usr/sbin/useradd -d /dev/null -g 200 -s /sbin/nologin -M %u
+
+  # Don't load printers
+  load printers = no
+  printing = bsd
+  printcap name = /dev/null
+  disable spoolss = yes
+
+[homes]
+  comment = Home Directories
+  browseable = yes
+  writable = yes
+
+[netlogon]
+  comment = Network Logon Service
+  path = {{ sambadc_netlogon_dir }}
+  browseable = No
+  writable = No
+
+[Profiles]
+  path = {{ sambadc_profiles_dir }}
+  create mask = 0755
+  directory mask = 0755
+  writable = Yes

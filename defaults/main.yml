@@ -1,4 +1,9 @@
 # roles/sambadc/defaults/main.yml
 ---
+sambadc_workgroup: WORKGROUP
+sambadc_netlogon_dir: /var/lib/samba/netlogon
+sambadc_profiles_dir: /var/lib/samba/profiles
+sambadc_machine_group: machine
 
+sambadc_enable_firewall: true
 

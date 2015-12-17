@@ -8,9 +8,86 @@
   with_items: sambadc_packages
   tags: sambadc
 
-- name: Ensure service is started
+- name: Enable SELinux booleans
+  seboolean:
+    name: "{{ item }}"
+    state: yes
+    persistent: yes
+  with_items: sambadc_sebooleans
+
+- name: Ensure services are started
   service:
-    name: "{{ sambadc_service }}"
+    name: "{{ item }}"
     state: started
     enabled: true
+  with_items: sambadc_services
   tags: sambadc
+
+- name: Ensure netlogon directory exists
+  file:
+    path: "{{ sambadc_netlogon_dir }}"
+    state: directory
+    mode: 1777
+    owner: root
+    group: root
+  tags: sambadc
+
+- name: Ensure profiles directory exists
+  file:
+    path: "{{ sambadc_profiles_dir }}"
+    state: directory
+    mode: 1777
+    owner: root
+    group: root
+  tags: sambadc
+
+- name: Ensure group for machine accounts exists
+  group:
+    name: "{{ sambadc_machine_group }}"
+    state: present
+    system: yes
+    gid: 200
+  tags: sambadc
+
+- name: Install config file
+  template:
+    src: etc_samba_smb.conf.j2
+    dest: /etc/samba/smb.conf
+    owner: root
+    group: root
+    mode: 0644
+    setype: samba_etc_t
+    validate: 'testparm -s %s'
+  notify: restart sambadc
+  tags: sambadc
+
+- name: Create Samba machine accounts
+  shell: "smbpasswd -m -a {{ item }}"
+  with_items: sambadc_machine_accounts
+  register: samba_create_machine_users
+  changed_when: "'Added user' in samba_create_machine_users.stdout"
+  when: sambadc_machine_accounts is defined
+  tags: sambadc
+
+- name: Create unix accounts for domain users
+  user:
+    name: "{{ item.name }}"
+    state: present
+  with_items: sambadc_users
+  when: sambadc_users is defined
+  tags: sambadc
+
+- name: Create domain users if they don't exist yet
+  shell: >
+    (pdbedit -L | grep {{ item.name }} 2>&1 > /dev/null) \
+    || (echo {{ item.password }}; echo {{ item.password }}) \
+    | smbpasswd -s -a {{ item.name }}
+  with_items: sambadc_users
+  register: samba_create_users
+  changed_when: "'Added user' in samba_create_users.stdout"
+  when: sambadc_users is defined
+  tags: sambadc
+
+- include: firewall.yml
+  when: sambadc_enable_firewall
+
