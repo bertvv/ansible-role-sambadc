@@ -1,0 +1,7 @@
+# roles/sambadc/handlers/main.yml
+---
+
+- name: restart sambadc
+  service:
+    name: "{{ sambadc_service }}"
+    state: restarted

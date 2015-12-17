@@ -1,0 +1,16 @@
+# roles/sambadc/tasks/main.yml
+---
+
+- name: Install packages
+  yum:
+    pkg: "{{ item }}"
+    state: installed
+  with_items: sambadc_packages
+  tags: sambadc
+
+- name: Ensure service is started
+  service:
+    name: "{{ sambadc_service }}"
+    state: started
+    enabled: true
+  tags: sambadc

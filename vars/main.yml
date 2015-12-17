@@ -1,0 +1,7 @@
+# roles/sambadc/vars/main.yml
+---
+
+sambadc_packages:
+  - sambadc
+
+sambadc_service: sambadcd
