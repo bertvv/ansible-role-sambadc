@@ -1,5 +1,15 @@
 ---
 - hosts: all
   sudo: true
+  vars:
+    sambadc_workgroup: mydomain
+    sambadc_machine_accounts:
+      - machine1
+    sambadc_users:
+      - name: Administrator
+        password: pass
+      - name: JohhnyUser
+        password: letmein
+
   roles:
     - sambadc
