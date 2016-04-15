@@ -1,8 +1,12 @@
 # Ansible role `sambadc`
 
-An Ansible role for PURPOSE. Specifically, the responsibilities of this role are to:
+An Ansible role for setting up Samba as an Active Directory Domain Controller.
+
+Specifically, the responsibilities of this role are to:
 
 -
+
+This was set up using this HOWTO on Unixmen: <https://github.com/bertvv/ansible-role-sambadc>
 
 ## Requirements
 
